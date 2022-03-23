@@ -13,40 +13,22 @@ Session(app)
 # localhost:5000/
 @app.route("/")
 def home():
-    return render_template('login.html', login_failed=False)
+    return flask.redirect(url_for('login'))
 
 @app.route("/login")
 def login():
-    return render_template('login1.html', login_failed=False)
+    return render_template('login.html', login_failed=False)
 
-@app.route("/play")
+@app.route("/signup")
 def play():
-    return render_template('play.html', utc_dt=datetime.datetime.utcnow())
+    return render_template('signup.html', bad_repeat = False)
 
-@app.route("/success")
-def app_page():
-    return '<h1 style="color:green">Welcome to the APP</h1>'
-
-@app.route("/failure")
-def login_fail():
-    return '<h1 style="color:red">FAIL</h1>'
-
-@app.route('/process_form', methods=['POST'])
-def process_form():
-    print(request.form)
-    # return f'GOT it <br /> {str(request.form)}'
-    if request.form["txt_name"] == 'itay' and request.form["txt_password"] == '1234':
-        return flask.redirect(url_for('app_page'))
-    else:
-        return flask.redirect(url_for('login_fail'))
-
-@app.route('/process_form_one', methods=['POST'])
-def process_form_one():
-    print(request.form)
-    # return f'GOT it <br /> {str(request.form)}'
-    if request.form["txt_name"] == 'itay' and request.form["txt_password"] == '1234':
-        return flask.redirect(url_for('app_page'))
-    else:
-        return render_template('login1.html', login_failed=True)
-
+@app.route("/signup_process", methods=['POST'])
+def handle_signup():
+    if request.form["psw"] != request.form["psw-repeat"]:
+        return render_template('signup.html', bad_repeat = True)
+    # check if user not already exist in db
+    # check if password length is not too short (optional*)
+    session['remember'] = request.form.get('remember')
+    return str(session['remember'])
 app.run(debug=True)
